@@ -2,7 +2,7 @@ package com.zerobase.community.user.service;
 
 import com.zerobase.community.component.MailComponent;
 import com.zerobase.community.component.SignUpMail;
-import com.zerobase.community.config.TokenProvider;
+import com.zerobase.community.security.TokenProvider;
 import com.zerobase.community.user.dto.SignUp;
 import com.zerobase.community.user.dto.VerifyCodeRequest;
 import com.zerobase.community.user.entity.EmailVerification;
@@ -12,8 +12,8 @@ import com.zerobase.community.user.exception.ErrorCode;
 import com.zerobase.community.user.repository.EmailVerificationRepository;
 import com.zerobase.community.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,12 +21,12 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class SignUpService implements UserDetailsService {
 
 
     private final UserRepository userRepository;
@@ -42,19 +42,23 @@ public class UserService implements UserDetailsService {
 
     public UserEntity userSignUp(SignUp form) {
 
+        System.out.println(form.toString());
+
         // 아이디 중복 체크
         if (userRepository.findById(form.getLoginId()).isPresent()) {
             throw new CustomException(ErrorCode.ALREADY_REGISTER_USER);
         }
 
         // 비밀번호 암호화
-        String encPassword = BCrypt.hashpw(form.getPassword(), BCrypt.gensalt());
+        String encPassword =
+                BCrypt.hashpw(form.getPassword(), BCrypt.gensalt());
 
         // 사용자 정보 저장
         UserEntity userEntity = UserEntity.builder()
                 .loginId(form.getLoginId())
                 .password(encPassword)
-                .roles(List.of("ROLE_USER"))  // roles 설정
+                .email(form.getEmail())
+                .roles(List.of("ROLE_USER_READ","ROLE_USER_WRITE"))  // roles 설정
                 .enabled(true)  // 인증 완료 후 활성화
                 .birth(form.getBirth())
                 .build();
@@ -103,6 +107,9 @@ public class UserService implements UserDetailsService {
     }
 
     public String verifyCode(VerifyCodeRequest form) {
+
+        log.info("verifycode starting.. {} ",form.getEmail());
+
         // 이메일로 인증 코드 조회
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(form.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));

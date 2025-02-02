@@ -1,5 +1,6 @@
-package com.zerobase.community.config;
+package com.zerobase.community.security.filter;
 
+import com.zerobase.community.security.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,17 +13,21 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+/**
+ * jwt 토큰을 읽어들여
+ * 정상 토큰이면 security context에 저장하는 클래스
+ */
 @RequiredArgsConstructor
 @Slf4j
 @Component
 // filter를 상속받으면 1 요청당 1 필터가 실행된다
 public class JwtAuthenticationfilter extends OncePerRequestFilter {
 
+    // http 프로토콜에서 사용하는 헤더가 Authorization 이다 
     public static final String TOKEN_HEADER = "Authorization";
-    // 인증 타입 > jwt 토큰을 사용하는 경우에는 토큰 앞에 Bearer을 붙인다
+    // 인증 타입 : Authorization jwt 토큰을 사용하는 경우에는 토큰 앞에 Bearer가 붙는다
     public static final String TOKEN_PREFIX = "Bearer ";
     private final TokenProvider tokenProvider;
 
@@ -44,16 +49,20 @@ public class JwtAuthenticationfilter extends OncePerRequestFilter {
         // 컨트롤러로 가기 전 요청이 들어올 때마다 토큰이 유효한지 아닌지 먼저 확인한다
         String token = resolveTokenFromRequest(request);
 
+        // 토큰 유효성 검사 후 인증 처리
         if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
+            // 인증 객체 생성
             Authentication auth = this.tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
+            log.info("auth.getAuthorities" + auth.getAuthorities().toString());
+
             log.info(String.format("[%s] -> %s"
-                    , this.tokenProvider.getUsername(token)
+                    , this.tokenProvider.getLoginId(token)
                     , request.getRequestURI()));
         }
 
-        // filter가 연속적으로 실행될 수 있도록
+        // filter가 연속적으로 실행될 수 있도록 다음 필터로 이동
         filterChain.doFilter(request, response);
     }
 }

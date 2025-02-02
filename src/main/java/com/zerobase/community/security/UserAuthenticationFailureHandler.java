@@ -1,4 +1,4 @@
-package com.zerobase.community.config;
+package com.zerobase.community.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
