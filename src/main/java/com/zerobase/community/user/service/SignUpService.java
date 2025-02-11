@@ -48,6 +48,7 @@ public class SignUpService implements UserDetailsService {
         }
 
         // 비밀번호 암호화
+
         // @Valid를 Entity에 걸어버리면 암호화된 패스워드가 max 길이 넘기 때문에,
         // dto에 걸어야 함
         String encPassword =
