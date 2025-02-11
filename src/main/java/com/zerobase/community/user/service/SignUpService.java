@@ -42,14 +42,15 @@ public class SignUpService implements UserDetailsService {
 
     public UserEntity userSignUp(SignUp form) {
 
-        System.out.println(form.toString());
-
         // 아이디 중복 체크
         if (userRepository.findById(form.getLoginId()).isPresent()) {
             throw new CustomException(ErrorCode.ALREADY_REGISTER_USER);
         }
 
         // 비밀번호 암호화
+
+        // @Valid를 Entity에 걸어버리면 암호화된 패스워드가 max 길이 넘기 때문에,
+        // dto에 걸어야 함
         String encPassword =
                 BCrypt.hashpw(form.getPassword(), BCrypt.gensalt());
 
@@ -58,7 +59,7 @@ public class SignUpService implements UserDetailsService {
                 .loginId(form.getLoginId())
                 .password(encPassword)
                 .email(form.getEmail())
-                .roles(List.of("ROLE_USER_READ","ROLE_USER_WRITE"))  // roles 설정
+                .roles(List.of("USER_READ","USER_WRITE"))  // roles 설정
                 .enabled(true)  // 인증 완료 후 활성화
                 .birth(form.getBirth())
                 .build();

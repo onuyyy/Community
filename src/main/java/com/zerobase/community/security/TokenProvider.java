@@ -46,8 +46,6 @@ public class TokenProvider {
         // key - value 형태로 저장해야 한다
         claims.put(KEY_ROLES, roles);
 
-        System.out.println(roles.toString());
-
         var now = new Date();
         var expiredDate = new Date(now.getTime() + TOKEN_EXPIRE_TIME);
 
@@ -93,8 +91,6 @@ public class TokenProvider {
         // UserDetailsService로 사용자 정보 로드
         UserDetails userDetails = userRepository.findById(loginId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + loginId));
-
-        System.out.println("getAuthentication  : " + userDetails.getAuthorities().toString());
 
         // 사용자 정보와 사용자의 권한 정보를 가지고 있다.
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
