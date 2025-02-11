@@ -29,12 +29,4 @@ public class SignInController {
         return ResponseEntity.ok(token);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER_READ')")
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        log.info("test");
-
-        return ResponseEntity.ok("test completed");
-    }
-
 }

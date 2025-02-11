@@ -1,6 +1,9 @@
 package com.zerobase.community.user.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.envers.AuditOverride;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,10 +27,17 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
     @Id
     @Column(unique = true, nullable = false)
+    @NotNull
+    @Size(min = 4, max = 15)
     private String loginId;
 
+    @NotNull
     private String password;
+
+    @NotNull
     private String email;
+
+    @NotNull
     private LocalDate birth;
 
     @ElementCollection(fetch = FetchType.EAGER)

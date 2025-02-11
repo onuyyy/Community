@@ -6,6 +6,7 @@ import com.zerobase.community.user.dto.VerifyCodeRequest;
 import com.zerobase.community.user.entity.UserEntity;
 import com.zerobase.community.user.repository.UserRepository;
 import com.zerobase.community.user.service.SignUpService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class SignUpController {
     private final TokenProvider tokenProvider;
 
     @PostMapping
-    public ResponseEntity<UserEntity> userSignUp(@RequestBody SignUp form) {
+    public ResponseEntity<UserEntity> userSignUp(@Valid @RequestBody SignUp form) {
 
         UserEntity user = signUpService.userSignUp(form);
 

@@ -17,8 +17,6 @@ public class UserAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
 
         String msg = "로그인에 실패하였습니다.";
 
-        System.out.println("로그인 실팽~~~");
-
         if (exception instanceof InternalAuthenticationServiceException) {
             msg = exception.getMessage();
         }

@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -47,17 +46,26 @@ public class SecurityConfiguration {
         http.csrf(csrf -> csrf.disable());
         http.headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.disable())
+                // jwtAuthenticationfilter 필터가 먼저 실행된다
         ).addFilterBefore(jwtAuthenticationfilter, UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/favicon.ico", "/files/**").permitAll()
+                .requestMatchers("/favicon.ico", "/files/**")
+                .permitAll()
                 .requestMatchers("/", "/signup/**", "/signin/**")
                 .permitAll()
+                .requestMatchers("/board/**").hasAnyRole("USER_WRITE", "USER_UPDATE")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()
-        ).exceptionHandling(except -> except
-                .accessDeniedPage("/error/denied"));
+        ).formLogin(form -> form
+                //.loginPage("/signin")
+                //.defaultSuccessUrl("/",true) // 로그인 성공 시
+                // .failureUrl("/fail") // 로그인 실패 시
+                .failureHandler(authenticationFailureHandler())
+                .permitAll()
+        ).exceptionHandling(except ->
+                except.accessDeniedPage("/error/denied"));
 
         return http.build();
     }
