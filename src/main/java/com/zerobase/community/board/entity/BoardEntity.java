@@ -1,5 +1,6 @@
 package com.zerobase.community.board.entity;
 
+import com.zerobase.community.board.dto.BoardDto;
 import com.zerobase.community.board.dto.Category;
 import com.zerobase.community.board.dto.WriteForm;
 import com.zerobase.community.user.entity.BaseEntity;
@@ -53,4 +54,16 @@ public class BoardEntity extends BaseEntity {
                 .build();
     }
 
+    public static BoardEntity fromBoardDto(BoardDto dto, UserEntity user) {
+
+        Category category = Category.getCategory(dto.getCategoryName());
+
+        return BoardEntity.builder()
+                .subject(dto.getSubject())
+                .content(dto.getContent())
+                .user(user)
+                .isDisplay(dto.isDisplay())
+                .category(category)
+                .build();
+    }
 }
