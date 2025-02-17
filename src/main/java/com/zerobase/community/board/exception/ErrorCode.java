@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
@@ -15,4 +18,10 @@ public enum ErrorCode {
 
     private final HttpStatus httpStatus;
     private final String detail;
+
+    // 추가: 여러 ID가 존재하지 않는 경우의 메시지를 처리하는 메서드
+    public static String getNotFoundBoardDetail(List<Long> ids) {
+        return "다음 게시글은 존재하지 않습니다: " + String.join(", ",
+                ids.stream().map(String::valueOf).collect(Collectors.toList()));
+    }
 }

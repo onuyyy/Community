@@ -59,7 +59,7 @@ public class SignUpService implements UserDetailsService {
                 .loginId(form.getLoginId())
                 .password(encPassword)
                 .email(form.getEmail())
-                .roles(List.of("USER_READ","USER_WRITE"))  // roles 설정
+                .roles(List.of("USER_UPDATE","USER_WRITE"))  // roles 설정
                 .enabled(true)  // 인증 완료 후 활성화
                 .birth(form.getBirth())
                 .build();
